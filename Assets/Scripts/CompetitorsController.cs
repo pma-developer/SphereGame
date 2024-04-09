@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Dynamic;
+using UnityEngine;
 
 namespace SphereGame
 {
@@ -37,25 +38,33 @@ namespace SphereGame
             }
         }
 
-        private bool TryGetValidSpawnPoint(out Vector3 resultVector, float sizeToSpawn, float playerSize, Vector3 playerPosition, Vector3 botLeftBoundary, Vector3 rightTopBoundary)
+        private bool TryGetValidSpawnPoint(out Vector3 resultVector, float radiusToSpawn, float playerRadius, Vector3 playerPosition, Vector3 botLeftBoundary, Vector3 rightTopBoundary)
         {
             const int maxPositionGenerationTries = 50;
             resultVector = _invalidSpawnVector; 
             for (var j = 0; j < maxPositionGenerationTries; j++)
             {
-                var randomInboundsVector = MathUtils.GetRandomSpherePosition(botLeftBoundary, rightTopBoundary, sizeToSpawn);
+                var randomInboundsVector = MathUtils.GetRandomSpherePositionIgnoreY(botLeftBoundary, rightTopBoundary, radiusToSpawn);
                     
-                if (MathUtils.IsSpheresColliding(randomInboundsVector, sizeToSpawn, playerPosition, playerSize))
+                if (MathUtils.IsSpheresColliding(randomInboundsVector, radiusToSpawn, playerPosition, playerRadius))
                 {
-                    break;
+                    continue;
                 }
+
+                var collides = false;
                 foreach (var competitor in _competitors)
                 {
                     if (competitor != null &&
-                        MathUtils.IsSpheresColliding(randomInboundsVector, sizeToSpawn, competitor.transform.position, competitor.Size))
+                        MathUtils.IsSpheresColliding(randomInboundsVector, radiusToSpawn, competitor.transform.position, competitor.Radius))
                     {
+                        collides = true;
                         break;
                     }
+                }
+
+                if (collides)
+                {
+                    continue;
                 }
 
                 resultVector = randomInboundsVector;
@@ -63,7 +72,7 @@ namespace SphereGame
             
             if (resultVector == _invalidSpawnVector)
             {
-                Debug.LogError($"Sphere of size {sizeToSpawn} does not fit into game scene with boundaries {botLeftBoundary} : {rightTopBoundary}.");
+                Debug.LogError($"Sphere of size {radiusToSpawn} does not fit into game scene with boundaries {botLeftBoundary} : {rightTopBoundary}.");
                 return false;
             }
             

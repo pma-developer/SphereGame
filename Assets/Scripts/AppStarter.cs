@@ -12,7 +12,7 @@ namespace SphereGame
 
         private void Start()
         {
-            _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinSize, _gameConfig.CompetitorMaxSize,
+            _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinRadius, _gameConfig.CompetitorMaxRadius,
                 _gameConfig.Gradient);
             var bottomLeft = _camera.ViewportToWorldPoint(new Vector2(0, 0));
             bottomLeft.y = 0;
@@ -20,7 +20,7 @@ namespace SphereGame
             topRight.y = 0;
 
             var playerTransform = _player.transform;
-            _competitorsController.GenerateCompetitors(playerTransform.localScale.y, playerTransform.position, bottomLeft, topRight);
+            _competitorsController.GenerateCompetitors(playerTransform.localScale.y/2, playerTransform.position, bottomLeft, topRight);
         }
 
         private void StartGame()

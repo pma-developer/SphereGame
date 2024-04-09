@@ -11,7 +11,7 @@ namespace SphereGame
         
         private Gradient _gradient;
 
-        public float Size { get; private set; }
+        public float Radius { get; private set; }
 
         private void Awake()
         {
@@ -19,10 +19,10 @@ namespace SphereGame
             _sphereResizer = GetComponent<SphereResizer>();
         }
 
-        private void SetSize(float newSize)
+        private void SetSize(float newRadius)
         {
-            Size = newSize;
-            _sphereResizer.Resize(newSize);
+            Radius = newRadius;
+            _sphereResizer.Resize(newRadius);
         }
 
         public void Init(Gradient gradient, float size)
@@ -43,7 +43,7 @@ namespace SphereGame
         // TODO: make more advanced color assignment(should take into account others competitors sizes as well)
         private Color GetColorFromOtherSize(float otherSize)
         {
-            return _gradient.Evaluate(Size / otherSize);
+            return _gradient.Evaluate(Radius / otherSize);
         }
     }
 }
