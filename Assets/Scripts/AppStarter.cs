@@ -6,7 +6,7 @@ namespace SphereGame
     public class AppStarter : MonoBehaviour
     {
         [SerializeField] private Camera _camera;
-        [SerializeField] private Player _player;
+        [SerializeField] private PlayerInputController _playerInputController;
         [SerializeField] private GameConfig _gameConfig;
         [SerializeField] private CompetitorsController _competitorsController;
 
@@ -19,8 +19,9 @@ namespace SphereGame
             var topRight = _camera.ViewportToWorldPoint(new Vector2(1, 1));
             topRight.y = 0;
 
-            var playerTransform = _player.transform;
+            var playerTransform = _playerInputController.transform;
             _competitorsController.GenerateCompetitors(playerTransform.localScale.y/2, playerTransform.position, bottomLeft, topRight);
+            _competitorsController.OnPlayerSizeChange(playerTransform.localScale.y/2);
         }
 
         private void StartGame()

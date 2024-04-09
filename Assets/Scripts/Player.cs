@@ -1,84 +1,43 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
-using UnityEngine.Diagnostics;
-using UnityEngine.UIElements;
 
 namespace SphereGame
 {
-    [RequireComponent(typeof(PlayerMovementController))]
-    public class Player : MonoBehaviour
+    [RequireComponent(typeof(SphereResizer))]
+    public class Player : MonoBehaviour, IVolumeProvider
     {
-        [SerializeField] private Camera _camera;
+        private SphereResizer _sphereResizer;
+        public event Action onVolumeChange;
+        
+        public float Radius { get; private set; }
 
-        [SerializeField] private float _forceGainFactor = 0.05f;
-        [SerializeField] private float _minForceMagnitude = 0f;
-        [SerializeField] private float _maxForceMagnitude = 5f;
-
-        [SerializeField] private ArrowController _arrow;
-        private PlayerMovementController _movementController;
-
-        private float _currentForceMagnitude;
-        private Vector2 _currentForceDirection;
-        private Vector3 CurrentForce => new Vector3(_currentForceDirection.x, 0, _currentForceDirection.y) * _currentForceMagnitude;
-
-        private bool _lmbPressed;
-
-        private void OnLmbDown()
+        public void Init(float startRadius)
         {
-            _arrow.ShowArrow();
+            SetRadius(startRadius);
         }
 
-        private void OnLmbPressed()
+        private void SetRadius(float newRadius)
         {
-            var position = transform.position;
-
-            var viewportPlayerPos3D = _camera.WorldToViewportPoint(position);
-            var viewportPlayerPos = new Vector2(viewportPlayerPos3D.x, viewportPlayerPos3D.y);
-            var viewportMousePosition = new Vector2(Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height);
-            _currentForceMagnitude = Mathf.Min(_currentForceMagnitude + _forceGainFactor, _maxForceMagnitude);
-            _currentForceDirection = -(viewportMousePosition - viewportPlayerPos).normalized;
-
-
-            _arrow.SetArrowData(position, CurrentForce + position);
+            Radius = newRadius;
+            _sphereResizer.Resize(newRadius);
+            onVolumeChange?.Invoke();
         }
 
-        private void OnLmbUp()
+        public float GetVolume()
         {
-            _movementController.ApplyForce(CurrentForce);
-
-            _currentForceMagnitude = _minForceMagnitude;
-            _arrow.HideArrow();
+            return 4f / 3f * Mathf.PI * Mathf.Pow(Radius, 3);
         }
 
-        #region MonoBehaviorEvents
+        public void IncreaseVolume(float volume)
+        {
+            var newVolume = GetVolume() + volume;
+            SetRadius(Mathf.Pow(3 * newVolume/(4*Mathf.PI), 0.3f));
+        }
 
         private void Awake()
         {
-            _movementController = GetComponent<PlayerMovementController>();
+            _sphereResizer = GetComponent<SphereResizer>();
         }
-
-        private void Update()
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                _lmbPressed = true;
-                OnLmbDown();
-            }
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                _lmbPressed = false;
-                OnLmbUp();
-            }
-
-            if (_lmbPressed)
-            {
-                OnLmbPressed();
-            }
-        }
-
-        #endregion
+        
     }
 }

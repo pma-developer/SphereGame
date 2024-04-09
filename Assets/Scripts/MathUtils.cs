@@ -4,6 +4,9 @@ namespace SphereGame
 {
     public static class MathUtils
     {
+        // TODO : REFACTOR!!
+        public const float FloorY = -0.5f;
+        
         public static Vector3 GetRandomVector(Vector3 bottomLeft, Vector3 topRight) =>
             new (
                 Random.Range(bottomLeft.x, topRight.x),
