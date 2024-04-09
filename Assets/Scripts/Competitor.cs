@@ -19,7 +19,7 @@ namespace SphereGame
             _sphereResizer = GetComponent<SphereResizer>();
         }
 
-        private void SetSize(float newRadius)
+        private void SetRadius(float newRadius)
         {
             Radius = newRadius;
             _sphereResizer.Resize(newRadius);
@@ -28,7 +28,7 @@ namespace SphereGame
         public void Init(Gradient gradient, float size)
         {
             _gradient = gradient;
-            SetSize(size);
+            SetRadius(size);
         }
 
         public void SetRelativeToSizeColor(float otherSize)
