@@ -33,5 +33,9 @@ namespace SphereGame
 
         public static bool IsSpheresColliding(Vector3 pos1, float radius1, Vector3 pos2, float radius2) =>
             pos1.SqrDistance(pos2) < Mathf.Pow(radius1 + radius2, 2);
+        
+        public static float GetSphereVolume(this float radius) => 4f / 3f * Mathf.PI * Mathf.Pow(radius, 3);
+        public static float GetSphereRadius(this float volume) => Mathf.Pow(3 * volume / (4 * Mathf.PI), 0.3f);
+
     }
 }

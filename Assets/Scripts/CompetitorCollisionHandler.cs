@@ -3,24 +3,24 @@ using UnityEngine;
 
 namespace SphereGame
 {
-    [RequireComponent(typeof(Collider), typeof(IVolumeProvider))]
+    [RequireComponent(typeof(Collider), typeof(ISphere))]
     public class CompetitorCollisionHandler : MonoBehaviour
     {
-        private IVolumeProvider _volumeProvider;
+        private ISphere _sphere;
 
         public event Action onCollisionWithBigger;
         
         private void Awake()
         {
-            _volumeProvider = GetComponent<IVolumeProvider>();
+            _sphere = GetComponent<ISphere>();
         }
 
         private void OnCollisionEnter(Collision other)
         {
-            var otherVolumeProvider = other.gameObject.GetComponent<IVolumeProvider>();
-            if (otherVolumeProvider.GetVolume() > _volumeProvider.GetVolume())
+            var otherSphere = other.gameObject.GetComponent<ISphere>();
+            if (otherSphere.Radius > _sphere.Radius)
             {
-                otherVolumeProvider.IncreaseVolume(_volumeProvider.GetVolume());
+                otherSphere.IncreaseVolume(_sphere.Radius);
                 onCollisionWithBigger?.Invoke();
             }
         }

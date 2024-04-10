@@ -4,10 +4,10 @@ using UnityEngine;
 namespace SphereGame
 {
     [RequireComponent(typeof(SphereResizer))]
-    public class Player : MonoBehaviour, IVolumeProvider
+    public class Player : MonoBehaviour, ISphere
     {
         private SphereResizer _sphereResizer;
-        public event Action onVolumeChange;
+        public event Action<float> onRadiusChange;
         
         public float Radius { get; private set; }
 
@@ -20,24 +20,23 @@ namespace SphereGame
         {
             Radius = newRadius;
             _sphereResizer.Resize(newRadius);
-            onVolumeChange?.Invoke();
+            onRadiusChange?.Invoke(newRadius);
         }
-
-        public float GetVolume()
+        
+        public void IncreaseVolume(float radius)
         {
-            return 4f / 3f * Mathf.PI * Mathf.Pow(Radius, 3);
-        }
-
-        public void IncreaseVolume(float volume)
-        {
-            var newVolume = GetVolume() + volume;
-            SetRadius(Mathf.Pow(3 * newVolume/(4*Mathf.PI), 0.3f));
+            var newVolume = Radius.GetSphereVolume() + radius.GetSphereVolume();
+            SetRadius(newVolume.GetSphereRadius());
         }
 
         private void Awake()
         {
             _sphereResizer = GetComponent<SphereResizer>();
         }
-        
+
+        private void OnDisable()
+        {
+            onRadiusChange = null;
+        }
     }
 }

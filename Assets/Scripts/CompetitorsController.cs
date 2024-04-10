@@ -23,9 +23,8 @@ namespace SphereGame
             _gradient = gradient;
             _competitors = new Competitor[_competitorsCount];
         }
-
-
-        public void GenerateCompetitors(float playerRadius, Vector3 playerPosition, Vector3 botLeftBoundary, Vector3 rightTopBoundary)
+        
+        public void SpawnCompetitors(float playerRadius, Vector3 playerPosition, Vector3 botLeftBoundary, Vector3 rightTopBoundary)
         {
             for (var i = 0; i < _competitors.Length; i++)
             {
@@ -35,6 +34,7 @@ namespace SphereGame
                 {
                     var spawnedCompetitor = Instantiate(_competitorPrefab, spawnPosition, Quaternion.identity);
                     spawnedCompetitor.Init(_gradient, randomRadius);
+                    
                     _competitors[i] = spawnedCompetitor;
                 }
             }
@@ -81,12 +81,12 @@ namespace SphereGame
             return false;
         }
 
-        public void DespawnCompetitor(Competitor competitor)
+        private void DespawnCompetitor(Competitor competitor)
         {
             competitor.gameObject.SetActive(false);
         }
 
-        public void OnPlayerSizeChange(float newPlayerSize)
+        public void OnPlayerRadiusChange(float newPlayerSize)
         {
             foreach (var competitor in _competitors)
             {

@@ -10,15 +10,14 @@ namespace SphereGame
     [RequireComponent(typeof(PlayerMovementController))]
     public class PlayerInputController : MonoBehaviour
     {
-        [SerializeField] private Camera _camera;
-
         [SerializeField] private float _forceGainFactor = 0.05f;
         [SerializeField] private float _minForceMagnitude = 0f;
         [SerializeField] private float _maxForceMagnitude = 5f;
-        
         [SerializeField] private float _visualArrowLengthMultiplier = 0.5f;
 
         [SerializeField] private ArrowController _arrow;
+        
+        private Camera _camera;
         private PlayerMovementController _movementController;
 
         private float _currentForceMagnitude;
@@ -55,11 +54,10 @@ namespace SphereGame
             _arrow.HideArrow();
         }
 
-        #region MonoBehaviorEvents
-
         private void Awake()
         {
             _movementController = GetComponent<PlayerMovementController>();
+            _camera = Camera.main;
         }
 
         private void Update()
@@ -82,6 +80,5 @@ namespace SphereGame
             }
         }
 
-        #endregion
     }
 }
