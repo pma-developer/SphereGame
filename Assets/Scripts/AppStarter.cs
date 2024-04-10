@@ -9,26 +9,27 @@ namespace SphereGame
         [SerializeField] private Transform _playerSpawnPoint;
         [SerializeField] private Player _playerPrefab;
         [SerializeField] private GameConfig _gameConfig;
+        [SerializeField] private UIService _uiService;
         [SerializeField] private CompetitorsController _competitorsController;
+        [SerializeField] private GameAreaController _gameAreaController;
 
         private void Start()
         {
+            _uiService.onScreenClick += RestartGame;
             _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinRadius, _gameConfig.CompetitorMaxRadius,
                 _gameConfig.Gradient);
-            var bottomLeft = _camera.ViewportToWorldPoint(new Vector2(0, 0));
-            bottomLeft.y = 0;
-            var topRight = _camera.ViewportToWorldPoint(new Vector2(1, 1));
-            topRight.y = 0;
 
             var player = Instantiate(_playerPrefab, _playerSpawnPoint.position, Quaternion.identity);
-            
-            _competitorsController.SpawnCompetitors(player.Radius, player.transform.position, bottomLeft, topRight);
+            MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
+                
+            _gameAreaController.AdjustToViewportResolution(bottomLeft, topRight);
+            _competitorsController.SpawnCompetitors(player.Radius, player.transform.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
             player.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
             
             player.Init(_gameConfig.PlayerStartRadius);
         }
-        
-        private void StartGame()
+
+        private void RestartGame()
         {
         }
     }

@@ -10,9 +10,7 @@ namespace SphereGame
         public void Resize(float newRadius)
         {
             iTween.Stop(gameObject);
-            var position = transform.position;
-            var flatPosition = new Vector3(position.x, 0, position.z);
-            iTween.MoveTo(gameObject, Vector3.up * (newRadius + MathUtils.FloorY) + flatPosition, resizeAnimDuration);
+            iTween.MoveAdd(gameObject, Vector3.up * (newRadius - transform.localScale.x/2), resizeAnimDuration);
             iTween.ScaleTo(gameObject, Vector3.one * (newRadius * 2), resizeAnimDuration);
         }
     }

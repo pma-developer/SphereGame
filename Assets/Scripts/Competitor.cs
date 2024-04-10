@@ -13,6 +13,7 @@ namespace SphereGame
         private Renderer _renderer;
         private CompetitorCollisionHandler _collisionHandler;
         private SphereCollider _sphereCollider;
+        
         private Gradient _gradient;
 
         public float Radius { get; private set; }

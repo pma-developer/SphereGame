@@ -4,9 +4,6 @@ namespace SphereGame
 {
     public static class MathUtils
     {
-        // TODO : REFACTOR!!
-        public const float FloorY = -0.5f;
-        
         public static Vector3 GetRandomVector(Vector3 bottomLeft, Vector3 topRight) =>
             new (
                 Random.Range(bottomLeft.x, topRight.x),
@@ -36,6 +33,13 @@ namespace SphereGame
         
         public static float GetSphereVolume(this float radius) => 4f / 3f * Mathf.PI * Mathf.Pow(radius, 3);
         public static float GetSphereRadius(this float volume) => Mathf.Pow(3 * volume / (4 * Mathf.PI), 0.3f);
+        public static void GetWorldScreenBorders(out Vector3 bottomLeft, out Vector3 topRight, Camera camera)
+        {
+            bottomLeft = camera.ViewportToWorldPoint(new Vector2(0, 0));
+            bottomLeft.y = 0;
+            topRight = camera.ViewportToWorldPoint(new Vector2(1, 1));
+            topRight.y = 0;
+        }
 
     }
 }

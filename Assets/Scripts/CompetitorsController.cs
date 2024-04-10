@@ -6,14 +6,14 @@ namespace SphereGame
     public class CompetitorsController : MonoBehaviour
     {
         [SerializeField] private Competitor _competitorPrefab;
-        
+
         private int _competitorsCount;
         private float _competitorMinSize;
         private float _competitorMaxSize;
         private Gradient _gradient;
-        
+
         private Competitor[] _competitors;
-        private readonly Vector3 _invalidSpawnVector = new (-9999, -9999, -9999);
+        private readonly Vector3 _invalidSpawnVector = new(-9999, -9999, -9999);
 
         public void Init(int competitorsCount, float competitorMinSize, float competitorMaxSize, Gradient gradient)
         {
@@ -23,47 +23,52 @@ namespace SphereGame
             _gradient = gradient;
             _competitors = new Competitor[_competitorsCount];
         }
-        
-        public void SpawnCompetitors(float playerRadius, Vector3 playerPosition, Vector3 botLeftBoundary, Vector3 rightTopBoundary)
+
+        public void SpawnCompetitors(float playerRadius, Vector3 playerPosition, Vector3 botLeft, Vector3 rightTop, float floorY)
         {
             for (var i = 0; i < _competitors.Length; i++)
             {
                 var randomRadius = Random.Range(_competitorMinSize, _competitorMaxSize);
 
-                if (TryGetValidSpawnPoint(out var spawnPosition, randomRadius, playerRadius, playerPosition, botLeftBoundary, rightTopBoundary))
+                if (TryGetValidSpawnPoint(out var spawnPosition, randomRadius, playerRadius, playerPosition,
+                        botLeft, rightTop, floorY))
                 {
                     var spawnedCompetitor = Instantiate(_competitorPrefab, spawnPosition, Quaternion.identity);
                     spawnedCompetitor.Init(_gradient, randomRadius);
-                    
+
                     _competitors[i] = spawnedCompetitor;
                 }
             }
         }
-        
-        private bool TryGetValidSpawnPoint(out Vector3 resultVector, float radiusToSpawn, float playerRadius, Vector3 playerPosition, Vector3 botLeftBoundary, Vector3 rightTopBoundary)
+
+        private bool TryGetValidSpawnPoint(out Vector3 resultVector, float radiusToSpawn, float playerRadius, Vector3 playerPosition,
+            Vector3 botLeft, Vector3 rightTop, float floorY)
         {
             const int maxPositionGenerationTries = 50;
-            resultVector = _invalidSpawnVector; 
+            resultVector = _invalidSpawnVector;
             for (var j = 0; j < maxPositionGenerationTries; j++)
             {
-                var randomInboundsVector = MathUtils.GetRandomSpherePositionIgnoreY(botLeftBoundary, rightTopBoundary, radiusToSpawn);
+                var randomInboundsVector = MathUtils.GetRandomSpherePositionIgnoreY(botLeft, rightTop, radiusToSpawn);
+                randomInboundsVector = new Vector3(randomInboundsVector.x, floorY, randomInboundsVector.z);
+                
                 var collidesWithPlayer = MathUtils.IsSpheresColliding(randomInboundsVector, radiusToSpawn, playerPosition, playerRadius);
 
                 if (collidesWithPlayer || HasCollisionsWithCompetitors(randomInboundsVector, radiusToSpawn))
                 {
                     continue;
                 }
-                
+
                 resultVector = randomInboundsVector;
                 break;
             }
-            
+
             if (resultVector == _invalidSpawnVector)
             {
-                Debug.LogError($"Sphere of size {radiusToSpawn} does not fit into game scene with boundaries {botLeftBoundary} : {rightTopBoundary}.");
+                Debug.LogError(
+                    $"Sphere of size {radiusToSpawn} does not fit into game scene with boundaries {botLeft} : {rightTop}.");
                 return false;
             }
-            
+
             return true;
         }
 
@@ -81,7 +86,7 @@ namespace SphereGame
             return false;
         }
 
-        private void DespawnCompetitor(Competitor competitor)
+        private void DestroyCompetitors(Competitor competitor)
         {
             competitor.gameObject.SetActive(false);
         }
