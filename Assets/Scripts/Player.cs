@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace SphereGame
@@ -11,8 +12,14 @@ namespace SphereGame
         
         public float Radius { get; private set; }
 
+        private void Awake()
+        {
+            _sphereResizer = GetComponent<SphereResizer>();
+        }
+
         public void Init(float startRadius)
         {
+            gameObject.transform.localScale = Vector3.zero;
             SetRadius(startRadius);
         }
 
@@ -29,11 +36,18 @@ namespace SphereGame
             SetRadius(newVolume.GetSphereRadius());
         }
 
-        private void Awake()
+        public void Despawn(Action onComplete = null)
         {
-            _sphereResizer = GetComponent<SphereResizer>();
+            StartCoroutine(DespawnCoroutine(onComplete));
         }
 
+        private IEnumerator DespawnCoroutine(Action onComplete = null)
+        {
+            _sphereResizer.Resize(0);
+            yield return new WaitForSeconds(_sphereResizer.ResizeAnimDuration);
+            gameObject.SetActive(false);
+            onComplete?.Invoke();
+        }
         private void OnDisable()
         {
             onRadiusChange = null;

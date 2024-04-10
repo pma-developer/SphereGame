@@ -1,5 +1,7 @@
-﻿using System.Dynamic;
+﻿using System;
+using System.Dynamic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace SphereGame
 {
@@ -15,6 +17,8 @@ namespace SphereGame
         private Competitor[] _competitors;
         private readonly Vector3 _invalidSpawnVector = new(-9999, -9999, -9999);
 
+        public event Action onPlayerBecameLargest;
+        
         public void Init(int competitorsCount, float competitorMinSize, float competitorMaxSize, Gradient gradient)
         {
             _competitorsCount = competitorsCount;
@@ -33,10 +37,20 @@ namespace SphereGame
                 if (TryGetValidSpawnPoint(out var spawnPosition, randomRadius, playerRadius, playerPosition,
                         botLeft, rightTop, floorY))
                 {
-                    var spawnedCompetitor = Instantiate(_competitorPrefab, spawnPosition, Quaternion.identity);
-                    spawnedCompetitor.Init(_gradient, randomRadius);
-
-                    _competitors[i] = spawnedCompetitor;
+                    var competitor = _competitors[i];
+                    if (competitor == null)
+                    {
+                        var spawnedCompetitor = Instantiate(_competitorPrefab, spawnPosition, Quaternion.identity);
+                        _competitors[i] = spawnedCompetitor;
+                        competitor = _competitors[i];
+                    }
+                    else
+                    {
+                        competitor.gameObject.SetActive(true);
+                        competitor.transform.position = spawnPosition;
+                    }
+                    
+                    competitor.Init(_gradient, randomRadius);
                 }
             }
         }
@@ -49,7 +63,7 @@ namespace SphereGame
             for (var j = 0; j < maxPositionGenerationTries; j++)
             {
                 var randomInboundsVector = MathUtils.GetRandomSpherePositionIgnoreY(botLeft, rightTop, radiusToSpawn);
-                randomInboundsVector = new Vector3(randomInboundsVector.x, floorY, randomInboundsVector.z);
+                randomInboundsVector = randomInboundsVector.WithY(floorY);
                 
                 var collidesWithPlayer = MathUtils.IsSpheresColliding(randomInboundsVector, radiusToSpawn, playerPosition, playerRadius);
 
@@ -77,6 +91,7 @@ namespace SphereGame
             foreach (var competitor in _competitors)
             {
                 if (competitor != null &&
+                    competitor.gameObject.activeSelf &&
                     MathUtils.IsSpheresColliding(position, radius, competitor.transform.position, competitor.Radius))
                 {
                     return true;
@@ -86,17 +101,31 @@ namespace SphereGame
             return false;
         }
 
-        private void DestroyCompetitors(Competitor competitor)
-        {
-            competitor.gameObject.SetActive(false);
-        }
-
-        public void OnPlayerRadiusChange(float newPlayerSize)
+        public void DespawnAllCompetitors(Action onComplete = null)
         {
             foreach (var competitor in _competitors)
             {
-                competitor.SetRelativeToSizeColor(newPlayerSize);
+                if (competitor != null && competitor.gameObject.activeSelf)
+                {
+                    competitor.Despawn();
+                }
             }
+        }
+
+        public void OnPlayerRadiusChange(float newPlayerRadius)
+        {
+            var playerIsTheBiggest = true;
+            foreach (var competitor in _competitors)
+            {
+                competitor.SetRelativeToSizeColor(newPlayerRadius);
+                if (competitor.Radius > newPlayerRadius)
+                {
+                    playerIsTheBiggest = false;
+                }
+            }
+            
+            if(playerIsTheBiggest)
+                onPlayerBecameLargest?.Invoke();
         }
     }
 }

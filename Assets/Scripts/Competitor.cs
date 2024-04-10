@@ -25,12 +25,16 @@ namespace SphereGame
             _collisionHandler = GetComponent<CompetitorCollisionHandler>();
             _sphereCollider = GetComponent<SphereCollider>();
         }
-
+        
+        // TODO: validate and dont allow double init with _isSpawned boolean flag 
         public void Init(Gradient gradient, float size)
         {
+            gameObject.transform.localScale = Vector3.zero;
+            
             _gradient = gradient;
             SetRadius(size);
-            _collisionHandler.onCollisionWithBigger += Despawn;
+            _collisionHandler.onCollisionWithBigger += DespawnNoCallback;
+            _sphereCollider.enabled = true;
         }
 
         public void IncreaseVolume(float radius)
@@ -53,18 +57,26 @@ namespace SphereGame
             _renderer.SetPropertyBlock(propBlock);
         }
 
-        private void Despawn()
+        private void DespawnNoCallback()
         {
-            StartCoroutine(DespawnCoroutine());
+            Despawn();
         }
 
-        private IEnumerator DespawnCoroutine()
+        public void Despawn(Action onComplete = null)
+        {
+            StartCoroutine(DespawnCoroutine(onComplete));
+        }
+
+        private IEnumerator DespawnCoroutine(Action onComplete = null)
         {
             _sphereCollider.enabled = false;
             _sphereResizer.Resize(0);
-            _collisionHandler.onCollisionWithBigger -= Despawn;
+            _collisionHandler.onCollisionWithBigger -= DespawnNoCallback;
+            
             yield return new WaitForSeconds(_sphereResizer.ResizeAnimDuration);
+            
             gameObject.SetActive(false);
+            onComplete?.Invoke();
         }
 
         // TODO: make more advanced color assignment(should take into account others competitors sizes as well)

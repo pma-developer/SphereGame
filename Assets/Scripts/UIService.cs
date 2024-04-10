@@ -15,6 +15,7 @@ namespace SphereGame
         private void OnEnable()
         {
             _fullscreenButton.onClick.AddListener(InvokeOnScreenClick);
+            _fullscreenButton.gameObject.SetActive(false);
         }
         private void OnDisable()
         {
@@ -29,11 +30,13 @@ namespace SphereGame
         public void ShowVictoryScreen()
         {
             _uiAnimator.SetBool(Shown, true);
+            _fullscreenButton.gameObject.SetActive(true);
         }
 
         public void HideVictoryScreen()
         {
             _uiAnimator.SetBool(Shown, false);
+            _fullscreenButton.gameObject.SetActive(false);
         }
     }
 }

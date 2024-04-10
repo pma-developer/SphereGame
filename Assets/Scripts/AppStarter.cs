@@ -13,24 +13,51 @@ namespace SphereGame
         [SerializeField] private CompetitorsController _competitorsController;
         [SerializeField] private GameAreaController _gameAreaController;
 
+        private Player _player;
         private void Start()
         {
             _uiService.onScreenClick += RestartGame;
-            _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinRadius, _gameConfig.CompetitorMaxRadius,
-                _gameConfig.Gradient);
 
-            var player = Instantiate(_playerPrefab, _playerSpawnPoint.position, Quaternion.identity);
             MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
                 
             _gameAreaController.AdjustToViewportResolution(bottomLeft, topRight);
-            _competitorsController.SpawnCompetitors(player.Radius, player.transform.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
-            player.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
+            _playerSpawnPoint.position = _playerSpawnPoint.position.WithY(_gameAreaController.GetFloorY());
             
-            player.Init(_gameConfig.PlayerStartRadius);
+            _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinRadius, _gameConfig.CompetitorMaxRadius,
+                _gameConfig.Gradient);
+            _competitorsController.onPlayerBecameLargest += EndGame;
+            _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
+            
+            InitPlayer();
+        }
+        
+        private void InitPlayer()
+        {
+            _player = Instantiate(_playerPrefab, _playerSpawnPoint.position, Quaternion.identity);
+            _player.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
+            _player.Init(_gameConfig.PlayerStartRadius);
         }
 
+        private void EndGame()
+        {
+            _uiService.ShowVictoryScreen();
+        }
+        
         private void RestartGame()
         {
+            _competitorsController.DespawnAllCompetitors();
+            _player.Despawn(() =>
+            {
+                _uiService.HideVictoryScreen();
+                
+                MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
+                _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
+                
+                _player.gameObject.SetActive(true);
+                _player.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
+                _player.transform.position = _playerSpawnPoint.position;
+                _player.Init(_gameConfig.PlayerStartRadius);
+            });
         }
     }
 }
