@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1b7194a06824862bcc6584e6fb83eb8, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
-  _competitorsCount: 10
+  _competitorsCount: 30
   _gradient:
     serializedVersion: 2
     key0: {r: 1, g: 0.4099019, b: 0, a: 1}
@@ -43,5 +43,6 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  _competitorMinSize: 0.1
-  _competitorMaxSize: 1.5
+  _competitorMinRadius: 0.05
+  _competitorMaxRadius: 0.4
+  _playerStartRadius: 0.2
