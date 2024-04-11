@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
+#if UNITY_EDITOR
+
 namespace SphereGame
 {
 
@@ -49,3 +51,4 @@ namespace SphereGame
 
     }
 }
+#endif
