@@ -15,10 +15,10 @@ namespace SphereGame
             _sphere = GetComponent<ISphere>();
         }
 
-        private void OnCollisionEnter(Collision other)
+        private void OnTriggerEnter(Collider other)
         {
             var otherSphere = other.gameObject.GetComponent<ISphere>();
-            if (otherSphere.Radius > _sphere.Radius)
+            if (otherSphere != null && otherSphere.Radius > _sphere.Radius)
             {
                 otherSphere.IncreaseVolume(_sphere.Radius);
                 onCollisionWithBigger?.Invoke();

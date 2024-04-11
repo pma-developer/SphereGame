@@ -5,11 +5,12 @@ using UnityEngine;
 
 namespace SphereGame
 {
-    [RequireComponent(typeof(SphereCollider))]
+    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
     [RequireComponent(typeof(Renderer), typeof(SphereResizer), typeof(CompetitorCollisionHandler))]
     public class Competitor : MonoBehaviour, ISphere
     {
         private SphereResizer _sphereResizer;
+        private Rigidbody _rigidbody;
         private Renderer _renderer;
         private CompetitorCollisionHandler _collisionHandler;
         private SphereCollider _sphereCollider;
@@ -24,6 +25,7 @@ namespace SphereGame
             _sphereResizer = GetComponent<SphereResizer>();
             _collisionHandler = GetComponent<CompetitorCollisionHandler>();
             _sphereCollider = GetComponent<SphereCollider>();
+            _rigidbody = GetComponent<Rigidbody>();
         }
         
         // TODO: validate and dont allow double init with _isSpawned boolean flag 
@@ -35,6 +37,7 @@ namespace SphereGame
             SetRadius(size);
             _collisionHandler.onCollisionWithBigger += DespawnNoCallback;
             _sphereCollider.enabled = true;
+            _rigidbody.velocity = Vector3.zero;
         }
 
         public void IncreaseVolume(float radius)
