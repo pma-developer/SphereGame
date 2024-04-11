@@ -2,22 +2,25 @@
 
 namespace SphereGame
 {
+    [RequireComponent(typeof(CompetitorCollisionHandler))]
     public class CompetitorMovementController : MonoBehaviour
     {
         [SerializeField] private float _forceMultiplier = 10;
         [SerializeField] private float _minTimeBetweenForces = 1f;
         [SerializeField] private float _maxTimeBetweenForces = 5f;
 
+        private CompetitorCollisionHandler _collisionHandler;
         private Rigidbody _rigidbody;
         private float _timeBeforeNextForce = 0f;
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
+            _collisionHandler = GetComponent<CompetitorCollisionHandler>();
             _timeBeforeNextForce = GetRandomForceDelay();
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (_timeBeforeNextForce <= 0f)
             {
@@ -26,7 +29,7 @@ namespace SphereGame
             }
             else
             {
-                _timeBeforeNextForce -= Time.deltaTime;
+                _timeBeforeNextForce -= Time.fixedDeltaTime;
             }
         }
 

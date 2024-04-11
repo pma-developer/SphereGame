@@ -82,6 +82,8 @@ namespace SphereGame
             {
                 Debug.LogError(
                     $"Sphere of size {radiusToSpawn} does not fit into game scene with boundaries {botLeft} : {rightTop}.");
+                //var randomInboundsVector = MathUtils.GetRandomSpherePositionIgnoreY(botLeft, rightTop, radiusToSpawn);
+                //resultVector = randomInboundsVector.WithY(floorY);
                 return false;
             }
 
@@ -107,7 +109,7 @@ namespace SphereGame
         {
             foreach (var competitor in _competitors)
             {
-                if (competitor != null && competitor.gameObject.activeSelf)
+                if (competitor != null && competitor.gameObject.activeSelf && competitor.IsDespawning == false)
                 {
                     competitor.Despawn();
                 }
@@ -122,7 +124,7 @@ namespace SphereGame
             
             foreach (var competitor in _competitors)
             {
-                if(competitor.gameObject.activeSelf == false || competitor.IsDespawning)
+                if(competitor == null || competitor.gameObject.activeSelf == false || competitor.IsDespawning)
                     continue;
                 
                 if (competitor.Radius > _currentPlayerRadius)
@@ -146,6 +148,8 @@ namespace SphereGame
             _currentPlayerRadius = newPlayerRadius;
             foreach (var competitor in _competitors)
             {
+                if(competitor == null || competitor.gameObject.activeSelf == false || competitor.IsDespawning)
+                    continue;
                 competitor.SetRelativeToSizeColor(_currentPlayerRadius);
             }
             AssertPlayerWin();

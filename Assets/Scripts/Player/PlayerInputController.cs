@@ -40,7 +40,7 @@ namespace SphereGame
                 }
             }
 #else
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) || Input.GetMouseButtonDown(0))
             {
                 OnInputUp();
             }

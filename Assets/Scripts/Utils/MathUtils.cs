@@ -30,12 +30,13 @@ namespace SphereGame
         public static Vector3 WithX(this Vector3 vector, float newX) => new (newX, vector.y, vector.z);
         public static Vector3 WithY(this Vector3 vector, float newY) => new (vector.x, newY, vector.z);
         public static Vector3 WithZ(this Vector3 vector, float newZ) => new (vector.x, vector.y, newZ);
+        public static Vector3 Abs(this Vector3 vector) => new (Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
 
         public static bool IsSpheresColliding(Vector3 pos1, float radius1, Vector3 pos2, float radius2) =>
             pos1.SqrDistance(pos2) < Mathf.Pow(radius1 + radius2, 2);
         
         public static float GetSphereVolume(this float radius) => 4f / 3f * Mathf.PI * Mathf.Pow(radius, 3);
-        public static float GetSphereRadius(this float volume) => Mathf.Pow(3 * volume / (4 * Mathf.PI), 0.3f);
+        public static float GetSphereRadius(this float volume) => Mathf.Pow(3 * volume / (4 * Mathf.PI), 1/3f);
         public static void GetWorldScreenBorders(out Vector3 bottomLeft, out Vector3 topRight, Camera camera)
         {
             bottomLeft = camera.ViewportToWorldPoint(new Vector2(0, 0));

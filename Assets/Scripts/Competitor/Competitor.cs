@@ -44,8 +44,11 @@ namespace SphereGame
 
         public void IncreaseVolume(float radius)
         {
-            var newVolume = Radius.GetSphereVolume() + radius.GetSphereVolume();
-            SetRadius(newVolume.GetSphereRadius());
+            var otherVolume = radius.GetSphereVolume();
+            var currentVolume = Radius.GetSphereVolume();
+            var newVolume = currentVolume + otherVolume;
+            var newRadius = newVolume.GetSphereRadius();
+            SetRadius(newRadius);
         }
         private void SetRadius(float newRadius)
         {

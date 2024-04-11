@@ -52,9 +52,9 @@ namespace SphereGame
                 audioSource.clip = clip;
                 audioSource.gameObject.SetActive(true);
                 audioSource.Play();
+                
+                StartCoroutine(DisableOnFinish(audioSource));
             }
-
-            StartCoroutine(DisableOnFinish(audioSource));
         }
         public void PlaySoundAtTransform(AudioClip clip, Transform playTransform)
         {
