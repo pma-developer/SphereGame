@@ -13,7 +13,9 @@ namespace SphereGame
         private Renderer _renderer;
         private CompetitorCollisionHandler _collisionHandler;
         private SphereCollider _sphereCollider;
-        
+        public event Action onRadiusChange;
+
+        public bool IsDespawning { get; private set; }
         private Gradient _gradient;
 
         public float Radius { get; private set; }
@@ -30,6 +32,7 @@ namespace SphereGame
         // TODO: validate and dont allow double init with _isSpawned boolean flag 
         public void Init(Gradient gradient, float size)
         {
+            onRadiusChange = null;
             gameObject.transform.localScale = Vector3.zero;
             
             _gradient = gradient;
@@ -47,6 +50,7 @@ namespace SphereGame
         private void SetRadius(float newRadius)
         {
             Radius = newRadius;
+            onRadiusChange?.Invoke();
             _sphereResizer.Resize(newRadius);
         }
 
@@ -69,6 +73,7 @@ namespace SphereGame
 
         public void Despawn(Action onComplete = null)
         {
+            IsDespawning = true;
             StartCoroutine(DespawnCoroutine(onComplete));
         }
 
@@ -80,6 +85,7 @@ namespace SphereGame
             
             yield return new WaitForSeconds(_sphereResizer.ResizeAnimDuration);
             
+            IsDespawning = false;
             gameObject.SetActive(false);
             onComplete?.Invoke();
         }

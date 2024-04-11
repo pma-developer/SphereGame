@@ -20,8 +20,8 @@ namespace SphereGame
             var otherSphere = other.gameObject.GetComponent<ISphere>();
             if (otherSphere != null && otherSphere.Radius > _sphere.Radius)
             {
-                otherSphere.IncreaseVolume(_sphere.Radius);
                 onCollisionWithBigger?.Invoke();
+                otherSphere.IncreaseVolume(_sphere.Radius);
             }
         }
     }

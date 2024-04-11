@@ -13,50 +13,61 @@ namespace SphereGame
         [SerializeField] private GameAreaController _gameAreaController;
 
         private Player _player;
+
         private void Start()
         {
             _uiService.onScreenClick += RestartGame;
 
             MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
-                
             _gameAreaController.AdjustToViewportResolution(bottomLeft, topRight);
             _playerSpawnPoint.position = _playerSpawnPoint.position.WithY(_gameAreaController.GetFloorY());
             
-            _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinRadius, _gameConfig.CompetitorMaxRadius,
-                _gameConfig.Gradient);
-            _competitorsController.onPlayerBecameLargest += EndGame;
-            _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
-            
-            InitPlayer();
-        }
-        
-        private void InitPlayer()
-        {
-            _player = Instantiate(_playerPrefab, _playerSpawnPoint.position, Quaternion.identity);
-            _player.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
-            _player.Init(_gameConfig.PlayerStartRadius);
+            InitCompetitorsController();
+            _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight,
+                _gameAreaController.GetFloorY());
+
+            _player = Instantiate(_playerPrefab);
+            InitPlayer(_player);
         }
 
-        private void EndGame()
+        private void InitCompetitorsController()
+        {
+            _competitorsController.Init(_gameConfig.CompetitorsCount, _gameConfig.CompetitorMinRadius, _gameConfig.CompetitorMaxRadius,
+                _gameConfig.Gradient);
+            _competitorsController.onPlayerBecameLargest += EndGameVictory;
+            _competitorsController.onPlayerBecameSmallest += EndGameLoss;
+        }
+
+        private void InitPlayer(Player instantiatedPlayer)
+        {
+            _player.gameObject.SetActive(true);
+            instantiatedPlayer.transform.position = _playerSpawnPoint.position;
+            instantiatedPlayer.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
+            instantiatedPlayer.Init(_gameConfig.PlayerStartRadius);
+        }
+
+        private void EndGameVictory()
         {
             _uiService.ShowVictoryScreen();
             _player.LockInput();
         }
-        
+        private void EndGameLoss()
+        {
+            _uiService.ShowLoseScreen();
+            _player.LockInput();
+        }
+
         private void RestartGame()
         {
-            _uiService.HideVictoryScreen();
-            
+            _uiService.HideEndGameScreen();
+
             _competitorsController.DespawnAllCompetitors();
             _player.Despawn(() =>
             {
                 MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
-                _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
-                
-                _player.gameObject.SetActive(true);
-                _player.onRadiusChange += _competitorsController.OnPlayerRadiusChange;
-                _player.transform.position = _playerSpawnPoint.position;
-                _player.Init(_gameConfig.PlayerStartRadius);
+                _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight,
+                    _gameAreaController.GetFloorY());
+                InitPlayer(_player);
             });
         }
     }

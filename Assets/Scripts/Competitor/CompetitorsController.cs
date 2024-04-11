@@ -16,7 +16,10 @@ namespace SphereGame
         private Competitor[] _competitors;
         private readonly Vector3 _invalidSpawnVector = new(-9999, -9999, -9999);
 
+        private float _currentPlayerRadius;
+
         public event Action onPlayerBecameLargest;
+        public event Action onPlayerBecameSmallest;
         
         public void Init(int competitorsCount, float competitorMinSize, float competitorMaxSize, Gradient gradient)
         {
@@ -41,15 +44,15 @@ namespace SphereGame
                     {
                         var spawnedCompetitor = Instantiate(_competitorPrefab, spawnPosition, Quaternion.identity);
                         _competitors[i] = spawnedCompetitor;
-                        competitor = _competitors[i];
+                        competitor = spawnedCompetitor;
                     }
                     else
                     {
                         competitor.gameObject.SetActive(true);
                         competitor.transform.position = spawnPosition;
                     }
-                    
                     competitor.Init(_gradient, randomRadius);
+                    competitor.onRadiusChange += () => { OnCompetitorRadiusChange(competitor); };
                 }
             }
         }
@@ -111,20 +114,46 @@ namespace SphereGame
             }
         }
 
-        public void OnPlayerRadiusChange(float newPlayerRadius)
+        // TODO: calculate loss by adding volumes of each remaining competitor(max volume that can actually be acquired by player), and comparing it to radius of largest competitor
+        private void AssertPlayerWin()
         {
             var playerIsTheBiggest = true;
+            var playerIsTheSmallest = true;
+            
             foreach (var competitor in _competitors)
             {
-                competitor.SetRelativeToSizeColor(newPlayerRadius);
-                if (competitor.Radius > newPlayerRadius)
+                if(competitor.gameObject.activeSelf == false || competitor.IsDespawning)
+                    continue;
+                
+                if (competitor.Radius > _currentPlayerRadius)
                 {
                     playerIsTheBiggest = false;
+                }
+                else
+                {
+                    playerIsTheSmallest = false;
                 }
             }
             
             if(playerIsTheBiggest)
                 onPlayerBecameLargest?.Invoke();
+            if(playerIsTheSmallest)
+                onPlayerBecameSmallest?.Invoke();
+        }
+
+        public void OnPlayerRadiusChange(float newPlayerRadius)
+        {
+            _currentPlayerRadius = newPlayerRadius;
+            foreach (var competitor in _competitors)
+            {
+                competitor.SetRelativeToSizeColor(_currentPlayerRadius);
+            }
+            AssertPlayerWin();
+        }
+        public void OnCompetitorRadiusChange(Competitor competitor)
+        {
+            competitor.SetRelativeToSizeColor(_currentPlayerRadius);
+            AssertPlayerWin();
         }
     }
 }
