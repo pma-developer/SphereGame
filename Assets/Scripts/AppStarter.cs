@@ -45,11 +45,11 @@ namespace SphereGame
         
         private void RestartGame()
         {
+            _uiService.HideVictoryScreen();
+            
             _competitorsController.DespawnAllCompetitors();
             _player.Despawn(() =>
             {
-                _uiService.HideVictoryScreen();
-                
                 MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
                 _competitorsController.SpawnCompetitors(_gameConfig.PlayerStartRadius, _playerSpawnPoint.position, bottomLeft, topRight, _gameAreaController.GetFloorY());
                 
