@@ -553,6 +553,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b044d10f10684c51bce023d764348c4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _endgameMessage: {fileID: 1870228762}
   _uiAnimator: {fileID: 1626447194}
   _fullscreenButton: {fileID: 1499980429}
 --- !u!1 &507592328
