@@ -27,7 +27,9 @@ namespace SphereGame
             return GetRandomVector(adjustedBottomLeft, adjustedTopRight);
         }
         public static float SqrDistance(this Vector3 vector, Vector3 other) => (vector - other).sqrMagnitude;
+        public static Vector3 WithX(this Vector3 vector, float newX) => new (newX, vector.y, vector.z);
         public static Vector3 WithY(this Vector3 vector, float newY) => new (vector.x, newY, vector.z);
+        public static Vector3 WithZ(this Vector3 vector, float newZ) => new (vector.x, vector.y, newZ);
 
         public static bool IsSpheresColliding(Vector3 pos1, float radius1, Vector3 pos2, float radius2) =>
             pos1.SqrDistance(pos2) < Mathf.Pow(radius1 + radius2, 2);

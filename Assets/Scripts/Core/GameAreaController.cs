@@ -19,19 +19,20 @@ namespace SphereGame
         }
         public void AdjustToViewportResolution(Vector3 bottomLeft, Vector3 topRight)
         {
-            var leftWallDepth = _leftWall.localScale.x;
-            _leftWall.position = new Vector3(bottomLeft.x - leftWallDepth / 2, _leftWall.position.y, (bottomLeft.z + topRight.z) / 2);
-
-            var rightWallDepth = _rightWall.localScale.x;
-            _rightWall.position = new Vector3(topRight.x + rightWallDepth / 2, _rightWall.position.y, (bottomLeft.z + topRight.z) / 2);
-
-            var topWallWidth = _topWall.localScale.z;
-            _topWall.position = new Vector3((bottomLeft.x + topRight.x) / 2, _topWall.position.y, topRight.z + topWallWidth / 2);
-
-            var bottomWallWidth = _bottomWall.localScale.z;
-            _bottomWall.position = new Vector3((bottomLeft.x + topRight.x) / 2, _bottomWall.position.y, bottomLeft.z - bottomWallWidth / 2);
-            
             var viewportSize = GetWorldViewportSize(bottomLeft, topRight);
+
+            _leftWall.localScale = _leftWall.localScale.WithZ(viewportSize.y);
+            _leftWall.position = new Vector3(bottomLeft.x - _leftWall.localScale.x / 2, _leftWall.position.y, (bottomLeft.z + topRight.z) / 2);
+
+            _rightWall.localScale = _rightWall.localScale.WithZ(viewportSize.y);
+            _rightWall.position = new Vector3(topRight.x + _rightWall.localScale.x / 2, _rightWall.position.y, (bottomLeft.z + topRight.z) / 2);
+
+            _topWall.localScale = _topWall.localScale.WithX(viewportSize.x);
+            _topWall.position = new Vector3((bottomLeft.x + topRight.x) / 2, _topWall.position.y, topRight.z + _topWall.localScale.z / 2);
+
+            _bottomWall.localScale = _bottomWall.localScale.WithX(viewportSize.x);
+            _bottomWall.position = new Vector3((bottomLeft.x + topRight.x) / 2, _bottomWall.position.y, bottomLeft.z - _bottomWall.localScale.z / 2);
+            
             _floor.localScale = new Vector3(viewportSize.x, _floor.localScale.y, viewportSize.y);
         }
         private Vector2 GetWorldViewportSize(Vector3 bottomLeft, Vector3 topRight)
