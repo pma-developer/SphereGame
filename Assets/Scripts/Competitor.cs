@@ -35,7 +35,7 @@ namespace SphereGame
             
             _gradient = gradient;
             SetRadius(size);
-            _collisionHandler.onCollisionWithBigger += DespawnNoCallback;
+            _collisionHandler.onCollisionWithBigger += DespawnWithSound;
             _sphereCollider.enabled = true;
             _rigidbody.velocity = Vector3.zero;
         }
@@ -55,13 +55,16 @@ namespace SphereGame
         {
             var propBlock = new MaterialPropertyBlock();
 
-            _renderer.GetPropertyBlock(propBlock);
-            propBlock.SetColor("_Color", GetColorFromOtherSize(otherSize));
-            _renderer.SetPropertyBlock(propBlock);
+            var color = GetColorFromOtherSize(otherSize);
+            _renderer.material.SetColor("_Color", color);
+            //_renderer.GetPropertyBlock(propBlock);
+            //propBlock.SetColor("_Color", );
+            //_renderer.SetPropertyBlock(propBlock);
         }
 
-        private void DespawnNoCallback()
+        private void DespawnWithSound()
         {
+            AudioManager.Instance.PlayPopSoundAtTransform(transform);
             Despawn();
         }
 
@@ -74,7 +77,7 @@ namespace SphereGame
         {
             _sphereCollider.enabled = false;
             _sphereResizer.Resize(0);
-            _collisionHandler.onCollisionWithBigger -= DespawnNoCallback;
+            _collisionHandler.onCollisionWithBigger -= DespawnWithSound;
             
             yield return new WaitForSeconds(_sphereResizer.ResizeAnimDuration);
             
