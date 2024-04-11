@@ -51,7 +51,6 @@ namespace SphereGame
         
         private void OnInputDown()
         {
-            _arrow.ShowArrow();
         }
 
         private void OnInputPressed(Vector3 inputPosition)
@@ -66,6 +65,7 @@ namespace SphereGame
             _currentForceDirection = new Vector3(forceDirection2D.x, 0, forceDirection2D.y);
 
             _arrow.SetArrowData(position, CurrentForce * _visualArrowLengthMultiplier + position);
+            _arrow.ShowArrow();
         }
 
         private void OnInputUp()

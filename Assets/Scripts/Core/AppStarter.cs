@@ -16,6 +16,7 @@ namespace SphereGame
 
         private void Start()
         {
+            Application.targetFrameRate = 144;
             _uiService.onScreenClick += RestartGame;
 
             MathUtils.GetWorldScreenBorders(out var bottomLeft, out var topRight, _camera);
