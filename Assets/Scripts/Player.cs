@@ -4,10 +4,11 @@ using UnityEngine;
 
 namespace SphereGame
 {
-    [RequireComponent(typeof(SphereResizer))]
+    [RequireComponent(typeof(SphereResizer), typeof(PlayerInputController))]
     public class Player : MonoBehaviour, ISphere
     {
         private SphereResizer _sphereResizer;
+        private PlayerInputController _playerInputController;
         public event Action<float> onRadiusChange;
         
         public float Radius { get; private set; }
@@ -15,14 +16,20 @@ namespace SphereGame
         private void Awake()
         {
             _sphereResizer = GetComponent<SphereResizer>();
+            _playerInputController = GetComponent<PlayerInputController>();
         }
 
         public void Init(float startRadius)
         {
             gameObject.transform.localScale = Vector3.zero;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            _playerInputController.UnlockInput();
             SetRadius(startRadius);
         }
 
+        public void LockInput() => _playerInputController.LockInput();
+        public void UnlockInput() => _playerInputController.UnlockInput();
+        
         private void SetRadius(float newRadius)
         {
             Radius = newRadius;

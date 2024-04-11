@@ -41,6 +41,7 @@ namespace SphereGame
         private void EndGame()
         {
             _uiService.ShowVictoryScreen();
+            _player.LockInput();
         }
         
         private void RestartGame()
