@@ -16,7 +16,6 @@ namespace SphereGame
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
-            _collisionHandler = GetComponent<CompetitorCollisionHandler>();
             _timeBeforeNextForce = GetRandomForceDelay();
         }
 
